@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>MI felfedezők: Az okos gyár interaktív küldetés</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #eaf6ff 0%, #f4f7fa 100%);
+            margin: 0; padding: 0; color: #222;
+            min-height: 100vh;
+            /* MI-hálózat minta */
+            background-image:
+                radial-gradient(circle at 20% 30%, #b2dfdb 0.5px, transparent 0.5px),
+                radial-gradient(circle at 80% 70%, #90caf9 0.5px, transparent 0.5px),
+                radial-gradient(circle at 50% 50%, #ffd600 1px, transparent 1px);
+            background-size: 1200px 800px, 900px 600px, 100vw 100vh;
+            background-repeat: no-repeat;
+        }
+        header {
+            background: linear-gradient(90deg, #263238 60%, #1976d2 100%);
+            color: #fff;
+            padding: 2rem 1rem 1rem 1rem;
+            text-align: center;
+            border-bottom: 4px solid #ffd600;
+            box-shadow: 0 2px 12px #0002;
+        }
+        h1 {
+            margin-top: 0;
+            letter-spacing: 1px;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 8px #1976d2aa;
+        }
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px #1976d233;
+            padding: 2rem;
+        }
+        section { margin-bottom: 2.5rem; }
+        .problems, .modules, .skills, .cards, .pitch { margin: 1.5rem 0; }
+        .problems ul, .modules ul, .skills ul { padding-left: 1.2rem; }
+        .skills {
+            background: #eaf6ff;
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 5px solid #1976d2;
+        }
+        .skills .level { margin-bottom: 1rem; }
+        .skills .locked { color: #888; }
+        .cards {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            background: linear-gradient(135deg, #263238 60%, #1976d2 100%);
+            color: #fff;
+            border-radius: 12px;
+            padding: 1.2rem;
+            flex: 1 1 180px;
+            min-width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #1976d244;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px;
+            width: 16px; height: 16px;
+            background: url('https://img.icons8.com/ios-filled/50/artificial-intelligence.png') no-repeat center/contain;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .card.revealed {
+            background: #fff;
+            color: #222;
+            border: 2px solid #1976d2;
+            box-shadow: 0 2px 12px #ffd60055;
+        }
+        details { margin: 0.5rem 0; }
+        summary { cursor: pointer; font-weight: bold; }
+        .quiz {
+            background: #f9fbe7;
+            border-left: 4px solid #b2df28;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px #b2df2822;
+        }
+        .pitch {
+            background: #fffde7;
+            border-left: 4px solid #ffd600;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px #ffd60022;
+        }
+        footer {
+            text-align: center;
+            color: #888;
+            margin: 2rem 0 1rem 0;
+            font-size: 0.95rem;
+        }
+        nav {
+            background: linear-gradient(90deg, #1a2533 60%, #1976d2 100%);
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 8px #1976d222;
+        }
+        nav span {
+            color: #fff;
+            font-weight: bold;
+            margin-right: 1rem;
+            letter-spacing: 0.5px;
+        }
+        nav select {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            border: 1px solid #1976d2;
+            background: #fff;
+            color: #222;
+            box-shadow: 0 1px 4px #1976d222;
+        }
+        /* MI chip ikon a menüben */
+        nav::before {
+            content: '';
+            display: inline-block;
+            vertical-align: middle;
+            width: 28px; height: 28px;
+            margin-right: 10px;
+            background: url('https://img.icons8.com/ios-filled/50/ffd600/artificial-intelligence.png') no-repeat center/contain;
+        }
+        /* Reszponzív stílusok */
+        @media (max-width: 900px) {
+            main { max-width: 98vw; }
+        }
+        @media (max-width: 600px) {
+            main { padding: 1rem; }
+            .cards { flex-direction: column; }
+            .card { min-width: unset; }
+            header { padding: 1rem 0.5rem 0.5rem 0.5rem; }
+            section { margin-bottom: 1.2rem; }
+            .skills, .quiz, .pitch { padding: 0.7rem; }
+            nav { padding: 0.5rem 0; }
+            nav select { width: 90vw; max-width: 350px; }
+        }
+        @media (max-width: 400px) {
+            h1 { font-size: 1.2rem; }
+            main { padding: 0.3rem; }
+            nav select { font-size: 0.9rem; }
+        }
+        .img-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .caption {
+            display: block;
+            font-size: 0.67em;
+            color: #555;
+            margin-bottom: 0.5em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MI felfedezők: Az okos gyár interaktív küldetés</h1>
+        <p>Üdvözlünk, Felfedező! Válj szakértővé, és mentsd meg a "Retro-gyárat" a mesterséges intelligencia segítségével!</p>
+    </header>
+    <nav>
+        <span>Küldetések:</span>
+        <select id="missionMenu">
+            <option value="1">1. küldetés</option>
+            <option value="2">2. küldetés</option>
+            <option value="3">3. küldetés</option>
+            <option value="4">4. küldetés</option>
+            <option value="5">5. küldetés</option>
+            <option value="6">6. küldetés</option>
+            <option value="7">7. küldetés</option>
+            <option value="8">8. küldetés</option>
+            <option value="9">9. küldetés</option>
+            <option value="10">10. küldetés</option>
+            <option value="11">11. küldetés</option>
+            <option value="12">12. küldetés</option>
+            <option value="13">13. küldetés</option>
+            <option value="14">14. küldetés</option>
+            <option value="15">15. küldetés</option>
+            <option value="16">16. küldetés</option>
+            <option value="17">17. küldetés</option>
+            <option value="18">18. küldetés</option>
+            <option value="19">19. küldetés</option>
+            <option value="20">20. küldetés</option>
+        </select>
+    </nav>
+    <main>
+        <section class="problems">
+            <h2>A küldetés: A "Retro-gyár" helyzetjelentése</h2>
+            <p><strong>Szigorúan bizalmas! Gyári helyzetjelentés:</strong></p>
+            <ul>
+                <li><strong>Váratlan gépleállások:</strong> Kulcsfontosságú gépeink minden előjel nélkül hibásodnak meg. A karbantartásunk reaktív, vagyis csak akkor javítunk, ha már megtörtént a baj. Ez hatalmas termelési kiesést és költséget jelent.</li>
+                <li><strong>Magas selejtarány:</strong> A manuális minőségellenőrzés lassú és megbízhatatlan. Rengeteg termék legördül a szalagról apró, de költséges hibákkal (karcolás, színeltérés).</li>
+                <li><strong>Pazarló energiafelhasználás:</strong> A gyár energiafogyasztása extrém magas. A rendszerek nem alkalmazkodnak a valós igényekhez, pazarolva ezzel az erőforrásokat.</li>
+            </ul>
+            <p><em>Várom az elemzésüket!<br>A Főmérnök</em></p>
+        </section>
+
+        <section class="modules">
+            <h2>Kiképzési modulok: Törd fel az MI kódexét!</h2>
+            <h3>1. kiképzés: Az MI kódexe (15 perc)</h3>
+            <ul>
+                <li>
+                    <strong>Turing-teszt:</strong> Képes egy gép emberként kommunikálni?<br>
+                    <img src="kepek/turing.png" alt="Alan Turing portré" class="kep img-center" ><br>
+                    <a href="https://botpenguin.com/glossary/turing-test" target="_blank" >
+                        <Span class="caption">Portrait of a young Alan Turing, pioneering mathematician and computer scientist</Span>
+                    </a>
+                    <a href="https://botpenguin.com/glossary/turing-test" target="_blank" >
+                        <img src="kepek/turing_teszt.png" alt="Turing-teszt szemléltető ábra" class="kep" >
+                        <span  class="caption">
+                            Diagram illustrating the Turing Test setup with an interrogator receiving answers from both a machine and a human
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <strong>Történelem:</strong> Az MI ötlete az 1950-es években született, de a valódi áttörést a modern számítási kapacitás és a Big Data hozta el.<br>
+                    <img src="kepek/MI_idovonal.png" alt="MI idővonal" class="kep" ><br>
+                    <span  class="caption">
+                        Timeline of key milestones in the history and development of artificial intelligence from 1642 to 2018
+                    </span>
+                    <img src="kepek/Dartmouth_resztvevok.png" alt="Dartmouth konferencia résztvevők" class="kep" ><br>
+                    <span  class="caption">
+                        Participants of the 1956 Dartmouth Summer Research Project on Artificial Intelligence, the foundational event of AI research
+                    </span>
+                    <img src="kepek/Google_utvonaltervezo.png" alt="Google útvonaltervező" class="kep" ><br>
+                    <span " class="caption">
+                        Google Maps route options from Manchester to London showing train and driving travel times and routes
+                    </span>
+                </li>
+                <li>
+                    <strong>Gyenge vs. erős MI:</strong> A ma létező MI-k szinte kivétel nélkül gyenge (narrow) MI-k, vagyis egy specifikus feladatra vannak kihegyezve (pl. arcfelismerés, útvonaltervezés). Az emberi szintű erős (general) MI még a sci-fi világába tartozik.<br>
+                    <img src="kepek/szuk_MI.png" alt="gyenge MI példa" class="kep img-center" ><br>
+                    <span  class="caption">
+                        A humanoid robot emerging from a smartphone interacts with a holographic digital face, symbolizing narrow AI and virtual assistants
+                    </span>
+                </li>
+            </ul>
+            <div class="quiz">
+                <strong>Villámkvíz! (+5 IP minden helyes válaszért)</strong>
+                <form id="quizForm">
+                    <div style="margin-bottom:1em;">
+                        <label><b>1. Melyik eseményhez köthető az "MI" kifejezés megszületése?</b></label><br>
+                        <input type="radio" name="q1" value="a" id="q1a">
+                        <label for="q1a">A Turing-teszt publikálása</label><br>
+                        <input type="radio" name="q1" value="b" id="q1b">
+                        <label for="q1b">A Dartmouth Konferencia (1956)</label><br>
+                        <input type="radio" name="q1" value="c" id="q1c">
+                        <label for="q1c">Az első számítógép megépítése</label>
+                    </div>
+                    <div style="margin-bottom:1em;">
+                        <label><b>2. A telefonodban lévő hangasszisztens (pl. Siri) gyenge vagy erős MI?</b></label><br>
+                        <input type="radio" name="q2" value="a" id="q2a">
+                        <label for="q2a">Erős MI</label><br>
+                        <input type="radio" name="q2" value="b" id="q2b">
+                        <label for="q2b">Gyenge MI</label>
+                    </div>
+                    <button type="button" onclick="checkQuiz()" style="margin-top:0.5em;">Ellenőrzés</button>
+                    <div id="quizResult" style="margin-top:1em; font-weight:bold;"></div>
+                </form>
+            </div>
+            <h3>2. kiképzés: Az MI motorja (15 perc)</h3>
+            <ul>
+                <li><strong>Adat:</strong> Az MI "üzemanyaga". Minél több és jobb minőségű, annál okosabb a rendszer. Az iparban ez lehet szenzoradat, kamerakép vagy gyártási statisztika.</li>
+                <li><strong>Algoritmus:</strong> A "recept", amely feldolgozza az adatot. Ez egy matematikai modell, ami a nyers adatból döntést vagy előrejelzést hoz létre.</li>
+                <li><strong>Tanulás:</strong> A folyamat, ahogy az MI egyre jobbá válik.
+                    <ul>
+                        <li>Felügyelt tanulás: Címkézett adatokból tanul (pl. "ez hibás", "ez jó").</li>
+                        <li>Felügyelet nélküli tanulás: Címkék nélkül, önállóan fedez fel mintázatokat.</li>
+                        <li>Megerősítéses tanulás: Jutalmazás és büntetés alapján, próbaszerencse alapon tanul.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section class="skills">
+            <h2>Fejlesztési térkép: Oldd fel a jövő technológiáit!</h2>
+            <div class="level">
+                <strong>ALAPSZINT</strong>
+                <ul>
+                    <li>
+                        <span>1. Képesség: AZ MI MOTORJA</span> <span class="locked">[LEZÁRT]</span><br>
+                        <small>Költség: -15 IP<br>Hatása: Megértitek az MI működésének alapjait. Ez a belépő a következő szintre.</small>
+                    </li>
+                </ul>
+                <span style="font-size:2rem; display:block; text-align:center;">⬇</span>
+            </div>
+            <div class="level">
+                <strong>1. SZINT: IPARI ALKALMAZÁSOK</strong>
+                <ul>
+                    <li>
+                        <span>2. Képesség: IPAR 4.0 INTEGRÁCIÓ</span> <span class="locked">[LEZÁRT]</span><br>
+                        <small>Költség: -20 IP<br>Hatása: Megismeritek a konkrét ipari megoldásokat: prediktív karbantartás, MI-alapú minőségellenőrzés, okos robotika és kiberbiztonság.</small>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Interaktív kihívás: Váratlan események!</h2>
+            <p>A modernizáció sosem zökkenőmentes. Húzzatok egy eseménykártyát, és hozzatok egy nehéz döntést!</p>
+            <div class="cards">
+                <div class="card" id="eventCard" onclick="revealRandomCard(this)">
+                    <span>Kattints ide egy kártya húzásához!</span>
+                </div>
+            </div>
+        </section>
+        <script>
+            // Eseménykártyák tartalma
+            const cardContents = [
+                `<strong>ESEMÉNYKÁRTYA: Belső ellenállás!</strong><br>
+                <em>Szituáció:</em> A gyár tapasztalt dolgozói attól tartanak, hogy az MI elveszi a munkájukat. A bizalmatlanságuk miatt szabotálhatják az adatgyűjtést.<br>
+                <em>Döntés:</em> Befektettek -10 IP-t egy "Átképzési és kommunikációs programba", hogy megnyugtassátok őket, vagy kockáztattok, hogy a projekt csúszik a rossz morál miatt?`,
+                `<strong>ESEMÉNYKÁRTYA: Szoftverhiba!</strong><br>
+                <em>Szituáció:</em> Az új MI-rendszer váratlanul hibát jelez, leáll a gyártósor.<br>
+                <em>Döntés:</em> Azonnal visszaállítjátok a régi rendszert (-5 IP), vagy kivizsgáljátok a hibát, de ezzel időt veszítetek?`,
+                `<strong>ESEMÉNYKÁRTYA: Adatvédelmi incidens!</strong><br>
+                <em>Szituáció:</em> Egy külső partner hibájából érzékeny gyártási adatok szivárogtak ki.<br>
+                <em>Döntés:</em> Jelentitek az incidenst a hatóságnak (-10 IP), vagy megpróbáljátok házon belül kezelni a problémát?`,
+                `<strong>ESEMÉNYKÁRTYA: Energiaválság!</strong><br>
+                <em>Szituáció:</em> Az energiaárak hirtelen megugranak, a gyár költségei nőnek.<br>
+                <em>Döntés:</em> Azonnal bevezetitek az MI-alapú energiaoptimalizálást (-15 IP), vagy vártok, hátha csökkennek az árak?`
+            ];
+            function revealRandomCard(cardElem) {
+                if (!cardElem.classList.contains('revealed')) {
+                    cardElem.classList.add('revealed');
+                    const idx = Math.floor(Math.random() * cardContents.length);
+                    cardElem.innerHTML = cardContents[idx];
+                }
+            }
+        </script>
+
+        <section class="pitch">
+            <h2>Végső projekt: A modernizációs terv (pitch)</h2>
+            <p>Most rajtatok a sor! Használjátok a megszerzett tudást, és állítsatok össze egy 2 perces prezentációt (pitch-et) a Főmérnöknek! Válasszatok egy problémát a helyzetjelentésből, és mutassátok be a megoldásotokat!</p>
+            <ol>
+                <li><strong>Probléma és megoldás:</strong> Mutassátok be a kiválasztott gyári problémát és a javasolt MI-megoldást.</li>
+                <li><strong>Az új technikus:</strong> Milyen új feladatai és felelősségei lesznek az ipari informatikai technikusnak az új rendszerben?</li>
+            </ol>
+            <p><strong>Példa pitch: "MI-alapú minőségellenőrzés"</strong></p>
+            <blockquote>
+                "Tisztelt Főmérnök Úr! A "Retro-gyár" profitját a magas selejtarány rombolja. A megoldásunk egy automatizált vizuális minőségellenőrző rendszer.<br>
+                Hogyan működik? A gyártósorra telepített kamerák és egy képfelismerő MI valós időben elemzik a termékeket. A rendszer egy olyan szuper-szem, ami sosem fárad el, és a legapróbb hibát is észleli.<br>
+                Ebben a rendszerben a technikus szerepe felértékelődik: ő lesz az MI-modell trénere és felügyelője, aki új hibatípusokra tanítja a rendszert. Ez a beruházás közvetlenül növeli a profitot és a minőséget. Köszönjük a figyelmet!"
+            </blockquote>
+        </section>
+
+        <section>
+            <h2>Gratulálunk, Felfedező!</h2>
+            <p>Sikeresen teljesítetted a küldetést. Most már te is az "Okos gyár" építői közé tartozol!</p>
+        </section>
+    </main>
+    <footer>
+        &copy; 2025 MI felfedezők | Interaktív tananyag
+    </footer>
+</body>
+</html>

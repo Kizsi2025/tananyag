@@ -1,0 +1,116 @@
+document.addEventListener('DOMContentLoaded', () => {
+    let innovationPoints = 60; // Kezdőpontok
+    const ipDisplay = document.getElementById('ip-display');
+    
+    // --- PONTOK KEZELÉSE ---
+    function updateIPDisplay() {
+        ipDisplay.textContent = innovationPoints;
+    }
+
+    function addIP(amount) {
+        innovationPoints += amount;
+        updateIPDisplay();
+    }
+
+    function spendIP(amount) {
+        if (innovationPoints >= amount) {
+            innovationPoints -= amount;
+            updateIPDisplay();
+            return true;
+        }
+        alert("Nincs elég Innovációs Pontod!");
+        return false;
+    }
+
+    // --- FELELETVÁLASZTÓS KVÍZ LOGIKA ---
+    const quizSubmitButton = document.getElementById('quiz-submit-btn');
+    const quizForm = document.getElementById('quizForm');
+    const resultDiv = document.getElementById('quizResult');
+
+    if (quizSubmitButton) {
+        quizSubmitButton.addEventListener('click', () => {
+            const correctAnswers = {
+                q1: 'b', // A Dartmouth Konferencia
+                q2: 'b'  // Gyenge MI
+            };
+
+            let score = 0;
+            const userAnswers = {
+                q1: quizForm.elements.q1.value,
+                q2: quizForm.elements.q2.value
+            };
+            
+            if (!userAnswers.q1 || !userAnswers.q2) {
+                alert("Kérjük, válaszolj mindkét kérdésre!");
+                return;
+            }
+
+            // Kérdések kiértékelése és vizuális visszajelzés
+            Object.keys(correctAnswers).forEach(qKey => {
+                const optionsContainer = document.getElementById(`${qKey}-options`);
+                const labels = optionsContainer.querySelectorAll('label');
+                const userAnswer = userAnswers[qKey];
+                const correctAnswer = correctAnswers[qKey];
+
+                labels.forEach(label => {
+                    const radio = label.querySelector('input');
+                    if (radio.value === correctAnswer) {
+                        label.classList.add('correct');
+                    }
+                    if (radio.checked && userAnswer !== correctAnswer) {
+                        label.classList.add('incorrect');
+                    }
+                });
+
+                if (userAnswer === correctAnswer) {
+                    score++;
+                }
+            });
+
+            // Pontszám és eredmény megjelenítése
+            const pointsEarned = score * 5;
+            addIP(pointsEarned);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `Eredmény: ${score} / 2 helyes. Szereztél <strong>${pointsEarned} IP</strong>-t!`;
+
+            // Gomb és rádiógombok letiltása
+            quizSubmitButton.disabled = true;
+            quizForm.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.disabled = true;
+            });
+        });
+    }
+
+    // --- FEJLESZTÉSI TÉRKÉP LOGIKA ---
+    const unlockButtons = document.querySelectorAll('.unlock-btn');
+    unlockButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const cost = parseInt(button.dataset.cost, 10);
+            const targetId = button.dataset.target;
+            const abilityElement = document.getElementById(targetId);
+
+            if (spendIP(cost)) {
+                abilityElement.classList.remove('locked');
+                abilityElement.classList.add('unlocked');
+                button.textContent = 'Feloldva';
+                button.disabled = true;
+            }
+        });
+    });
+    
+    // --- INTERAKTÍV KIHÍVÁS LOGIKA ---
+    const eventButton = document.getElementById('event-decision-btn');
+    if(eventButton) {
+        eventButton.addEventListener('click', () => {
+            const cost = parseInt(eventButton.dataset.cost, 10);
+            if (spendIP(cost)) {
+                alert("Sikeresen befektettél a programba! A dolgozói morál javulni fog.");
+                eventButton.textContent = 'Program elindítva';
+                eventButton.disabled = true;
+            }
+        });
+    }
+
+    // Kezdeti IP kijelző frissítése
+    updateIPDisplay();
+});
