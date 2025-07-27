@@ -29,7 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function spendIP(amount) {
         if (innovationPoints >= amount) {
-            innovationPoints -= amount;return true;
+            innovationPoints -= amount;
+            updateIPDisplay(); // JAVÍTÁS: Ez a sor hiányzott!
+            return true;
         }
         alert("Nincs elég Innovációs Pontod!");
         return false;
@@ -54,7 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loginHeaderBtn) loginHeaderBtn.classList.remove('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
         if (userNameSpan) userNameSpan.classList.add('hidden');
+        /* --- FELHASZNÁLÓNÉV TÖRLÉSE A CÍMSORBÓL --- */
+        if (userNameSpan) {
+            userNameSpan.textContent = '';      // szöveg törlése
+            userNameSpan.classList.add('hidden'); // elem elrejtése
+    }
         if (authContainer) authContainer.classList.add('hidden');
+        
     }
 
     // --- AUTOMATIKUS BEJELENTKEZÉS ELLENŐRZÉS ---
