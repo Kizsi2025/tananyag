@@ -1461,5 +1461,259 @@ img {
     margin: 10px 0;
 }
 #pitch-status { font-weight:600; color:var(--primary-color); }
+/* --- BEJELENTKEZÉSI/REGISZTRÁCIÓS FELÜLET STÍLUSOK --- */
 
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+}
+
+.auth-box {
+    width: 420px;
+    max-width: 95%;
+    background-color: var(--light-text);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden; /* Elrejti a kicsúszó űrlapot */
+}
+
+.auth-box h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.auth-slider-buttons {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    background-color: #eef2f5;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.auth-btn {
+    width: 50%;
+    height: 100%;
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 2; /* A gombok a csúszka felett vannak */
+}
+
+.auth-slider {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 25px;
+    z-index: 1;
+    transition: left 0.3s ease;
+    left: 0;
+}
+
+.auth-slider.moves-right {
+    left: 50%;
+}
+
+.auth-form-section {
+    display: flex;
+    width: 200%; /* Két űrlap elfér egymás mellett */
+    position: relative;
+    left: 0;
+    transition: left 0.4s ease-in-out;
+}
+
+.auth-form-section.moves-left {
+    left: -100%;
+}
+
+.auth-form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px; /* Kis belső térköz */
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f8f9fa;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(60, 99, 130, 0.2);
+}
+
+.forgot-password {
+    text-align: right;
+    font-size: 0.9em;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.submit-btn {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+
+/* --- LÁTHATÓSÁG ÉS ÚJ GOMB STÍLUSOK --- */
+
+/* Segédosztály az elemek elrejtéséhez */
+.hidden {
+    display: none !important;
+}
+
+/* A fejlécben lévő vezérlők egy sorba rendezése */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Térköz a pontszámláló és a gomb között */
+}
+
+/* A kilépés gomb stílusa */
+#logout-btn {
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#logout-btn:hover {
+    background-color: #c0392b; /* Egy pirosas árnyalat a kilépés jelzésére */
+}
+/* --- HIÁNYZÓ CSS KIEGÉSZÍTÉSEK --- */
+
+/* Segédosztály az elemek elrejtéséhez */
+.hidden {
+    display: none !important;
+}
+
+/* A fejlécben lévő vezérlők egy sorba rendezése */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Fejlécben lévő gombok stílusa */
+#login-header-btn, #logout-btn {
+    background-color: var(--secondary-color);
+    color: var(--light-text);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#login-header-btn:hover, #logout-btn:hover {
+    background-color: var(--primary-color);
+}
+
+#logout-btn:hover {
+    background-color: #c0392b;
+}
+
+/* --- EGYSZERŰSÍTETT BEJELENTKEZÉSI PANEL STÍLUSOK --- */
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.auth-box {
+    width: 420px;
+    max-width: 95%;
+    background-color: var(--light-text);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.auth-box h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.auth-form-section {
+    width: 100%;
+}
+
+.auth-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(60, 99, 130, 0.2);
+}
+#user-name {
+    color: var(--light-text);
+    font-weight: bold;
+    margin-right: .5rem;
+}
 

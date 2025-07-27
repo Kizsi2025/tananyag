@@ -3,16 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MI Felfedezők: Az Okos Gyár Küldetés</title>
+    <title>MI felfedezők: Az Okos gyár küldetés</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>MI felfedezők: Az Okos gyár interaktív küldetés</h1>
+    <h1>Retro-gyár modernizáció</h1>
+    <div class="header-controls">
         <div class="ip-counter">
-            <p>Innovációs pontok (IP): <span id="ip-display">60</span></p>
+            Innovációs Pontok: <span id="ip-display">60</span>
         </div>
-    </header>
+
+        <!-- ÚJ: felhasználónév -->
+        <span id="user-name" class="hidden"></span>
+        
+      <!-- ÚJ GOMBOK A FEJLÉCBEN -->
+        <button id="login-header-btn">Bejelentkezés</button>
+        <button id="logout-btn" class="hidden">Kilépés</button>
+    </div>
+</header>
+<main id="main-content" class="hidden">
+    <section class="auth-container">
+    <div class="auth-box">
+        <!-- Gombok a váltáshoz -->
+        <div class="auth-slider-buttons">
+            <div class="auth-slider"></div>
+            <button class="auth-btn login-btn">Bejelentkezés</button>
+            <button class="auth-btn signup-btn">Regisztráció</button>
+        </div>
+
+        <!-- Űrlapok szekciója -->
+        <div class="auth-form-section">
+            <!-- Bejelentkezési űrlap -->
+            <form class="auth-form login-box">
+                <h3>Üdv újra!</h3>
+                <input type="email" placeholder="E-mail cím" class="auth-input" autocomplete="email" required>
+                <input type="password" placeholder="Jelszó" class="auth-input" autocomplete="current-password" required>
+                <a href="#" class="forgot-password">Elfelejtetted a jelszavad?</a>
+                <button type="submit" class="submit-btn">Bejelentkezés</button>
+            </form>
+
+            <!-- Regisztrációs űrlap -->
+            <form class="auth-form signup-box">
+                <h3>Fiók létrehozása</h3>
+                <input type="text" placeholder="Név" class="auth-input" autocomplete="name" required>
+                <input type="email" placeholder="E-mail cím" class="auth-input" autocomplete="email" required>
+                <input type="password" placeholder="Jelszó" class="auth-input" autocomplete="new-password" required>
+                <input type="password" placeholder="Jelszó megerősítése" class="auth-input" autocomplete="new-password" required>
+                <button type="submit" class="submit-btn">Regisztráció</button>
+            </form>
+        </div>
+    </div>
+</section>
 
     <main class="container">
         <section id="intro">
@@ -1063,7 +1105,7 @@
 
         </section>
     </main>
-
+</main>
     <footer>
         <p>Gratulálunk, Felfedező! Sikeresen teljesítetted a küldetést. Most már te is az "Okos gyár" építői közé tartozol.[1]</p>
     </footer>
