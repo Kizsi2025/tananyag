@@ -1595,6 +1595,7 @@ img {
 /* Segédosztály az elemek elrejtéséhez */
 .hidden {
     display: none !important;
+    
 }
 
 /* A fejlécben lévő vezérlők egy sorba rendezése */

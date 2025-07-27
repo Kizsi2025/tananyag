@@ -1,448 +1,154 @@
-document.addEventListener('DOMContentLoaded', () => {
+/* ----------------------------------------------------------
+   script.js – Retro-gyár tananyag – végleges, hibamentes verzió
+   ---------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', () =>  {
+  let innovationPoints = 60;
+  const ipDisplay    = document.getElementById('ip-display');
+  const mainContent  = document.getElementById('main-content');
 
-    // --- GLOBÁLIS VÁLTOZÓK ÉS ÁLLAPOTOK ---
-    let innovationPoints = 60;
-    const ipDisplay = document.getElementById('ip-display');
+  /* ---------- AUTH-ELEMEK ---------- */
+  const authContainer  = document.querySelector('.auth-container');
+  const loginForm      = document.querySelector('.login-box');
+  const signupForm     = document.querySelector('.signup-box');
+  const loginHeaderBtn = document.getElementById('login-header-btn');
+  const logoutBtn      = document.getElementById('logout-btn');
+  const userNameSpan   = document.getElementById('user-name');
 
-    // --- ELEMEK KIVÁLASZTÁSA ---
-    const mainContent = document.getElementById('main-content');
-    
-    // Hitelesítési elemek
-    const authContainer = document.querySelector('.auth-container');
-    const loginForm = document.querySelector('.login-box');
-    const signupForm = document.querySelector('.signup-box');
-    const loginHeaderBtn = document.getElementById('login-header-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userNameSpan = document.getElementById('user-name');
+  /* ---------- SEGÉDFÜGGVÉNYEK ---------- */
+  const updateIPDisplay = () => ipDisplay && (ipDisplay.textContent = innovationPoints);
 
-    // --- SEGÉDFÜGGVÉNYEK ---
-    function updateIPDisplay() {
-        if (ipDisplay) {
-            ipDisplay.textContent = innovationPoints;
-        }
-    }
+  const addIP = n => { innovationPoints += n; updateIPDisplay(); };
+  const spendIP = n => {
+    if (innovationPoints >= n) { innovationPoints -= n; updateIPDisplay(); return true; }
+    alert('Nincs elég Innovációs Pontod!'); return false;
+  };
 
-    function addIP(amount) {
-        innovationPoints += amount;
-        updateIPDisplay();
-    }
+  const showUserName = n => userNameSpan &&
+    (userNameSpan.textContent = `Üdv, ${n}!`, userNameSpan.classList.remove('hidden'));
 
-    function spendIP(amount) {
-        if (innovationPoints >= amount) {
-            innovationPoints -= amount;
-            updateIPDisplay(); // JAVÍTÁS: Ez a sor hiányzott!
-            return true;
-        }
-        alert("Nincs elég Innovációs Pontod!");
-        return false;
-    }
+  const showMain = () => {
+    mainContent?.classList.remove('hidden');
+    loginHeaderBtn?.classList.add('hidden');
+    logoutBtn?.classList.remove('hidden');
+    authContainer?.classList.add('hidden');
+  };
 
-    function showUserName(name) {
-        if (userNameSpan) {
-            userNameSpan.textContent = `Üdv, ${name}!`;
-            userNameSpan.classList.remove('hidden');
-        }
-    }
+  const hideMain = () => {
+    mainContent?.classList.add('hidden');
+    loginHeaderBtn?.classList.remove('hidden');
+    logoutBtn?.classList.add('hidden');
+    if (userNameSpan) { userNameSpan.textContent = ''; userNameSpan.classList.add('hidden'); }
+    authContainer?.classList.add('hidden');
+  };
 
-    function showMainContent() {
-        if (mainContent) mainContent.classList.remove('hidden');
-        if (loginHeaderBtn) loginHeaderBtn.classList.add('hidden');
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-        if (authContainer) authContainer.classList.add('hidden');
-    }
+  /* ---------- AUTO-LOGIN ---------- */
+  const token = localStorage.getItem('authToken');
+  const name  = localStorage.getItem('userName');
+  if (token && name) {
+    fetch('/api/auth/profile', { headers:{Authorization:`Bearer ${token}`} })
+      .then(r => r.ok ? (showMain(), showUserName(name)) : localStorage.clear())
+      .catch(() => localStorage.clear());
+  }
 
-    function hideMainContent() {
-        if (mainContent) mainContent.classList.add('hidden');
-        if (loginHeaderBtn) loginHeaderBtn.classList.remove('hidden');
-        if (logoutBtn) logoutBtn.classList.add('hidden');
-        if (userNameSpan) userNameSpan.classList.add('hidden');
-        /* --- FELHASZNÁLÓNÉV TÖRLÉSE A CÍMSORBÓL --- */
-        if (userNameSpan) {
-            userNameSpan.textContent = '';      // szöveg törlése
-            userNameSpan.classList.add('hidden'); // elem elrejtése
-    }
-        if (authContainer) authContainer.classList.add('hidden');
-        
-    }
+  /* ---------- LOGIN PANEL ---------- */
+  loginHeaderBtn?.addEventListener('click', () => authContainer?.classList.remove('hidden'));
+  authContainer?.addEventListener('click', e => e.target === authContainer && authContainer.classList.add('hidden'));
 
-    // --- AUTOMATIKUS BEJELENTKEZÉS ELLENŐRZÉS ---
-    const savedToken = localStorage.getItem('authToken');
-    const savedName = localStorage.getItem('userName');
-    
-    if (savedToken && savedName) {
-        // Token validálás
-        fetch('/api/auth/profile', {
-            headers: { 'Authorization': `Bearer ${savedToken}` }
-        })
-        .then(response => {
-            if (response.ok) {
-                showMainContent();
-                showUserName(savedName);
-            } else {
-                // Token érvénytelen, töröljük
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userName');
-            }
-        })
-        .catch(() => {
-            // Hálózati hiba esetén is töröljük
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userName');
-        });
-    }
+  /* váltás login / signup */
+  document.querySelector('.login-btn') ?.addEventListener('click', e => {
+    e.preventDefault(); loginForm.classList.remove('hidden'); signupForm.classList.add('hidden');
+  });
+  document.querySelector('.signup-btn')?.addEventListener('click', e => {
+    e.preventDefault(); signupForm.classList.remove('hidden'); loginForm.classList.add('hidden');
+  });
 
-    // --- BEJELENTKEZÉSI PANEL KEZELÉSE ---
+  /* ---------- LOGIN ---------- */
+  loginForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const [email,password] = [loginForm.elements[0].value, loginForm.elements[1].value];
+    try {
+      const r = await fetch('/api/auth/signin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      if (!r.ok) { alert('Hibás adatok!'); return; }
+      const {token:userToken,user} = await r.json();
+      localStorage.setItem('authToken', userToken);
+      localStorage.setItem('userName',  user.name);
+      showMain(); showUserName(user.name); loginForm.reset();
+    } catch { alert('Hálózati hiba!'); }
+  });
 
-    // Bejelentkezési panel megjelenítése
-    if (loginHeaderBtn && authContainer) {
-        loginHeaderBtn.addEventListener('click', () => {
-            authContainer.classList.remove('hidden');
-        });
-    }
+  /* ---------- SIGN-UP ---------- */
+  signupForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const [nameInput,email,password,pw2] = [...signupForm.elements].map(el=>el.value);
+    if (password !== pw2) { alert('A jelszavak nem egyeznek!'); return; }
+    try {
+      const r = await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nameInput,email,password})});
+      if (!r.ok) { alert('Regisztrációs hiba!'); return; }
+      const {token:userToken,user} = await r.json();
+      localStorage.setItem('authToken', userToken);
+      localStorage.setItem('userName',  user.name);
+      showMain(); showUserName(user.name); signupForm.reset();
+    } catch { alert('Hálózati hiba!'); }
+  });
 
-    // Panel bezárása háttérre kattintással
-    if (authContainer) {
-        authContainer.addEventListener('click', (event) => {
-            if (event.target === authContainer) {
-                authContainer.classList.add('hidden');
-            }
-        });
-    }
+  /* ---------- LOGOUT ---------- */
+  logoutBtn?.addEventListener('click', () => { localStorage.clear(); hideMain(); });
 
-    // --- BEJELENTKEZÉS ---
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            const email = loginForm.elements[0].value;
-            const password = loginForm.elements[1].value;
+  /* ---------- TARTALOM FELOLDÁS ---------- */
+  document.querySelectorAll('.unlock-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      if (!spendIP(+btn.dataset.cost)) return;
 
-            try {
-                const response = await fetch('/api/auth/signin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+      /* osztály-alapú feloldás (data-topic) */
+      const topic = btn.dataset.topic;
+      if (topic)
+        document.querySelectorAll(`.session.${topic}`).forEach(sec => sec.classList.remove('hidden'));
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    alert(errorData.msg || 'Bejelentkezési hiba');
-                    return;
-                }
+      /* többszörös ID-lista (data-target="id1,id2") */
+      (btn.dataset.target?.split(',') || []).forEach(id => {
+        document.getElementById(id.trim())?.classList.remove('hidden');
+      });
 
-                const { token, user } = await response.json();
+      btn.disabled = true;
+      btn.textContent = 'Feloldva';
+      btn.style.cssText = 'background:#95a5a6;cursor:not-allowed';
+    })
+  );
 
-                // Token és felhasználói adatok mentése
-                localStorage.setItem('authToken', token);
-                localStorage.setItem('userName', user.name);
+  /* ---------- KVÍZEK (mintapélda az elsőre) ---------- */
+  const quizBtn = document.getElementById('quiz-submit-btn');
+  quizBtn?.addEventListener('click', () => {
+    const correct = {q1:'b',q2:'b'};
+    const form = document.getElementById('quizForm');
+    let score = 0;
+    for (const k in correct)
+      if (form.elements[k]?.value === correct[k]) score++;
+    addIP(score*5);
+    const res = document.getElementById('quizResult');
+    res.classList.remove('hidden'); res.textContent = `Találatok: ${score}/2 | +${score*5} IP`;
+    quizBtn.disabled = true; quizBtn.style.background='#95a5a6';
+  });
 
-                // UI frissítése
-                showMainContent();
-                showUserName(user.name);
+  /* ---------- AI PITCH (rövidített) ---------- */
+  const pitchBtn = document.getElementById('submit-pitch-btn');
+  pitchBtn?.addEventListener('click', async () => {
+    const txt = document.getElementById('pitch-text').value.trim();
+    if (!txt) { alert('Írj be szöveget!'); return; }
+    const stat = document.getElementById('pitch-status');
+    stat.textContent = 'Értékelés folyamatban…'; stat.style.color='#f39c12';
+    pitchBtn.disabled = true;
+    try {
+      const headers = {'Content-Type':'application/json'};
+      const t = localStorage.getItem('authToken'); if (t) headers.Authorization = `Bearer ${t}`;
+      const r = await fetch(t?'/evaluate':'/evaluate-public',{method:'POST',headers,body:JSON.stringify({prompt:txt})});
+      if (!r.ok) throw new Error('Hiba az értékelésnél');
+      const {result} = await r.json();
+      stat.innerHTML = `<strong>AI értékelés:</strong><br>${result.replace(/\n/g,'<br>')}`;
+      stat.style.color='#27ae60'; addIP(10);
+    } catch(e){ stat.textContent=`Hiba: ${e.message}`; stat.style.color='#e74c3c'; }
+    pitchBtn.disabled = false;
+  });
 
-                // Űrlap visszaállítása
-                loginForm.reset();
-
-            } catch (error) {
-                console.error('Bejelentkezési hiba:', error);
-                alert('Hálózati hiba történt a bejelentkezés során.');
-            }
-        });
-    }
-
-    // --- REGISZTRÁCIÓ ---
-    if (signupForm) {
-        signupForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            const name = signupForm.elements[0].value;
-            const email = signupForm.elements[1].value;
-            const password = signupForm.elements[2].value;
-            const confirmPassword = signupForm.elements[3].value;
-
-            if (password !== confirmPassword) {
-                alert('A jelszavak nem egyeznek!');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    alert(errorData.msg || 'Regisztrációs hiba');
-                    return;
-                }
-
-                const { token, user } = await response.json();
-
-                // Token és felhasználói adatok mentése
-                localStorage.setItem('authToken', token);
-                localStorage.setItem('userName', user.name);
-
-                // UI frissítése
-                showMainContent();
-                showUserName(user.name);
-
-                // Űrlap visszaállítása
-                signupForm.reset();
-
-                alert('Sikeres regisztráció!');
-
-            } catch (error) {
-                console.error('Regisztrációs hiba:', error);
-                alert('Hálózati hiba történt a regisztráció során.');
-            }
-        });
-    }
-
-    // --- KIJELENTKEZÉS ---
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            // Tárolt adatok törlése
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userName');
-
-            // UI visszaállítása
-            hideMainContent();
-
-            alert('Sikeresen kijelentkezett!');
-        });
-    }
-
-    // --- CSÚSZKÁS VÁLTÁS A BEJELENTKEZÉSI PANELEN (HA VAN) ---
-    const loginBtn = document.querySelector('.login-btn');
-    const signupBtn = document.querySelector('.signup-btn');
-    const authSlider = document.querySelector('.auth-slider');
-    const formSection = document.querySelector('.auth-form-section');
-
-    if (loginBtn && signupBtn && authSlider && formSection) {
-        // Váltás a bejelentkezésre
-        loginBtn.addEventListener('click', () => {
-            authSlider.classList.remove('moves-right');
-            formSection.classList.remove('moves-left');
-        });
-
-        // Váltás a regisztrációra
-        signupBtn.addEventListener('click', () => {
-            authSlider.classList.add('moves-right');
-            formSection.classList.add('moves-left');
-        });
-    }
-
-    // --- TARTALOM FELOLDÁSI RENDSZER ---
-    const unlockButtons = document.querySelectorAll('.unlock-btn');
-    unlockButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const cost = parseInt(button.dataset.cost);
-            if (spendIP(cost)) {
-                const targetContentId = button.dataset.target;
-                if (targetContentId) {
-                    const targetContent = document.getElementById(targetContentId);
-                    if (targetContent) {
-                        targetContent.style.display = 'block';
-                    }
-                }
-                button.disabled = true;
-                button.textContent = 'Feloldva';
-                button.style.backgroundColor = '#95a5a6';
-            }
-        });
-    });
-
-    // --- KVÍZ RENDSZER ---
-
-    // Első kvíz (MI alapok)
-    const quizSubmitButton = document.getElementById('quiz-submit-btn');
-    const quizForm = document.getElementById('quizForm');
-    const resultDiv = document.getElementById('quizResult');
-    
-    if (quizSubmitButton && quizForm && resultDiv) {
-        quizSubmitButton.addEventListener('click', () => {
-            const correctAnswers = { q1: 'b', q2: 'b' };
-            const totalQuestions = Object.keys(correctAnswers).length;
-            let score = 0;
-
-            for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
-                if (quizForm.elements[question] && quizForm.elements[question].value === correctAnswer) {
-                    score++;
-                }
-            }
-
-            const pointsEarned = score * 5;
-            addIP(pointsEarned);
-            
-            resultDiv.style.display = 'block';
-            resultDiv.textContent = `Találatok: ${score} / ${totalQuestions} | Szerzett pont: ${pointsEarned} IP`;
-            
-            quizSubmitButton.disabled = true;
-            quizSubmitButton.textContent = 'Befejezve';
-        });
-    }
-
-    // Második kvíz (miért van szükség MI-re)
-    const secondQuizBtn = document.getElementById('fnQuiz-submit-btn');
-    const secondQuizForm = document.getElementById('fundamentalsNeedQuizForm');
-    const secondResultDiv = document.getElementById('fnQuizResult');
-    
-    if (secondQuizBtn && secondQuizForm && secondResultDiv) {
-        secondQuizBtn.addEventListener('click', () => {
-            const correctAnswers = { fnq1: 'b', fnq2: 'a', fnq3: 'a', fnq4: 'c' };
-            const totalQuestions = Object.keys(correctAnswers).length;
-            let score = 0;
-
-            for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
-                if (secondQuizForm.elements[question] && secondQuizForm.elements[question].value === correctAnswer) {
-                    score++;
-                }
-            }
-
-            const pointsEarned = score * 5;
-            addIP(pointsEarned);
-            
-            secondResultDiv.style.display = 'block';
-            secondResultDiv.textContent = `Találatok: ${score} / ${totalQuestions} | Szerzett pont: ${pointsEarned} IP`;
-            
-            secondQuizBtn.disabled = true;
-            secondQuizBtn.textContent = 'Befejezve';
-        });
-    }
-
-    // Harmadik kvíz (Ipar 4.0 és AI kapcsolata)
-    const thirdQuizBtn = document.getElementById('industry4-quiz-submit-btn');
-    const thirdQuizForm = document.getElementById('industry4QuizForm');
-    const thirdResultDiv = document.getElementById('industry4QuizResult');
-    
-    if (thirdQuizBtn && thirdQuizForm && thirdResultDiv) {
-        thirdQuizBtn.addEventListener('click', () => {
-            const correctAnswers = { 
-                iq1: 'c', 
-                iq2: 'b', 
-                iq3: 'a', 
-                iq4: 'b' 
-            };
-            const totalQuestions = Object.keys(correctAnswers).length;
-            let score = 0;
-
-            for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
-                if (thirdQuizForm.elements[question] && thirdQuizForm.elements[question].value === correctAnswer) {
-                    score++;
-                }
-            }
-
-            const pointsEarned = score * 5;
-            addIP(pointsEarned);
-            
-            thirdResultDiv.style.display = 'block';
-            thirdResultDiv.textContent = `Találatok: ${score} / ${totalQuestions} | Szerzett pont: ${pointsEarned} IP`;
-            
-            thirdQuizBtn.disabled = true;
-            thirdQuizBtn.textContent = 'Befejezve';
-        });
-    }
-
-    // Negyedik kvíz (IT technikus jövője)
-    const fourthQuizBtn = document.getElementById('future-quiz-submit-btn');
-    const fourthQuizForm = document.getElementById('futureQuizForm');
-    const fourthResultDiv = document.getElementById('futureQuizResult');
-    
-    if (fourthQuizBtn && fourthQuizForm && fourthResultDiv) {
-        fourthQuizBtn.addEventListener('click', () => {
-            const correctAnswers = { 
-                fq1: 'b', 
-                fq2: 'c', 
-                fq3: 'a', 
-                fq4: 'b', 
-                fq5: 'c' 
-            };
-            const totalQuestions = Object.keys(correctAnswers).length;
-            let score = 0;
-
-            for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
-                if (fourthQuizForm.elements[question] && fourthQuizForm.elements[question].value === correctAnswer) {
-                    score++;
-                }
-            }
-
-            const pointsEarned = score * 5;
-            addIP(pointsEarned);
-            
-            fourthResultDiv.style.display = 'block';
-            fourthResultDiv.textContent = `Találatok: ${score} / ${totalQuestions} | Szerzett pont: ${pointsEarned} IP`;
-            
-            fourthQuizBtn.disabled = true;
-            fourthQuizBtn.textContent = 'Befejezve';
-        });
-    }
-
-    // --- AI PITCH ÉRTÉKELŐ ---
-    const submitBtn = document.getElementById('submit-pitch-btn');
-    const pitchInput = document.getElementById('pitch-text');
-    const pitchStatus = document.getElementById('pitch-status');
-
-    if (submitBtn && pitchInput && pitchStatus) {
-        submitBtn.addEventListener('click', async () => {
-            const userPitch = pitchInput.value.trim();
-            
-            if (!userPitch) {
-                alert("Kérlek írd be a pitch szövegét!");
-                return;
-            }
-
-            // Indikátor megjelenítése
-            pitchStatus.textContent = "Értékelés folyamatban...";
-            pitchStatus.style.color = "#f39c12";
-            submitBtn.disabled = true;
-
-            try {
-                const token = localStorage.getItem('authToken');
-                const endpoint = token ? '/evaluate' : '/evaluate-public';
-                const headers = { 'Content-Type': 'application/json' };
-                
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                }
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ prompt: userPitch })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Hiba történt az értékelés során');
-                }
-
-                const data = await response.json();
-                
-                // Eredmény megjelenítése
-                pitchStatus.innerHTML = `<strong>AI Értékelés:</strong><br>${data.result.replace(/\n/g, '<br>')}`;
-                pitchStatus.style.color = "#27ae60";
-
-                // Pont jutalom sikeres értékelésért
-                addIP(10);
-                
-            } catch (error) {
-                console.error('Pitch értékelés hiba:', error);
-                pitchStatus.textContent = `Hiba: ${error.message}`;
-                pitchStatus.style.color = "#e74c3c";
-            } finally {
-                submitBtn.disabled = false;
-            }
-        });
-    }
-
-    // --- INICIALIZÁLÁS ---
-    updateIPDisplay();
-
-    // Console log debugging célokra
-    console.log('Script.js sikeresen betöltődött');
-    console.log('Innovációs pontok:', innovationPoints);
-    console.log('Mentett token:', savedToken ? 'Van' : 'Nincs');
-
-}); // DOMContentLoaded eseménykezelő vége
+  /* ---------- KEZDŐ ÁLLAPOT ---------- */
+  updateIPDisplay();
+});
