@@ -1718,4 +1718,173 @@ img {
     margin-right: .5rem;
 }
 
+/* ========== SESSION TARTALOM TELJES MEGJELENÍTÉS ========== */
+
+/* Alapvető session stílusok - teljes magasság */
+.session {
+    height: auto !important;           /* Automatikus magasság */
+    max-height: none !important;       /* Max-height korlátozás eltávolítása */
+    min-height: auto !important;       /* Min-height visszaállítása */
+    overflow: visible !important;      /* Tartalom látható legyen */
+    displayintű megjelenítés */
+    width: 100%;                       /* Teljes szélesség */
+    padding: 1.5rem;                   /* Megfelelő belső térköz */
+    margin-bottom: 1.5rem;             /* Alsó margó */
+    background-color: var(--light-text, #ffffff);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Rejtett session elemek kezelése */
+.session.hidden {
+    display: none !important;
+}
+
+/* Session tartalom elemek */
+.session h2, .session h3, .session h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary-color, #2c3e50);
+}
+
+.session p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: var(--text-color, #333);
+}
+
+.session ul, .session ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.session li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Képek a session-ökben */
+.session img {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+/* Report box speciális stílusok */
+.report-box {
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--accent-color, #3498db);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.report-box h3 {
+    color: var(--secondary-color, #e74c3c);
+    margin-bottom: 1rem;
+}
+
+.report-box ol {
+    margin-bottom: 1rem;
+}
+
+.report-box li {
+    margin-bottom: 1rem;
+}
+
+/* Module bokszok */
+.module {
+    background-color: #f1f3f4;
+    border: 1px solid #e0e4e7;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.module h3 {
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 0.5rem;
+}
+
+.module p {
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+/* Feloldó gombok */
+.unlock-btn {
+    background-color: var(--accent-color, #3498db);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.unlock-btn:hover {
+    background-color: var(--secondary-color, #2980b9);
+    transform: translateY(-1px);
+}
+
+.unlock-btn:disabled {
+    background-color: #95a5a6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Kvíz eredmények */
+.quiz-result {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+/* Pitch eredmények */
+.pitch-result {
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+/* Responsív design */
+@media (max-width: 768px) {
+    .session {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .module {
+        padding: 1rem;
+    }
+    
+    .report-box {
+        padding: 1rem;
+    }
+}
+
+/* Debug stílusok (fejlesztéshez - később törölhető) */
+.session.debug {
+    border: 2px dashed #e74c3c;
+    background-color: #fff5f5;
+}
+
+.session.debug::before {
+    content: "DEBUG: Session teljes magasság";
+    display: block;
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    margin: -1.5rem -1.5rem 1rem -1.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
 
